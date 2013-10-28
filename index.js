@@ -40,11 +40,17 @@ var forkWorker = function() {
   });
 };
 
-forky = module.exports = function(path, cb) {
+forky = module.exports = function(path, limit, cb) {
   cluster.setupMaster({
     exec: path
   });
-  var cores = os.cpus().length;
+
+  if (typeof limit === 'function') {
+    cb = limit;
+    limit = null;
+  }
+
+  var cores = limit || os.cpus().length;
   forky.log('starting', cores, 'workers');
   for(var i = 0; i < cores; i++) {
     forkWorker();
